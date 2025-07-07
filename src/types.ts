@@ -21,3 +21,11 @@ export interface ChatMessage {
   role: "system" | "user" | "assistant";
   content: string;
 }
+
+/**
+ * Represents a chat request with messages and optional model.
+ */
+export interface ChatRequest {
+  messages: ChatMessage[];
+  model?: string;
+}

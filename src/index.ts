@@ -7,11 +7,11 @@
  *
  * @license MIT
  */
-import { Env, ChatMessage } from "./types";
+import { Env, ChatMessage, ChatRequest } from "./types";
 
-// Model ID for Workers AI model
+// Default model ID for Workers AI model
 // https://developers.cloudflare.com/workers-ai/models/
-const MODEL_ID = "@cf/meta/llama-3.3-70b-instruct-fp8-fast";
+const DEFAULT_MODEL_ID = "@cf/meta/llama-3.3-70b-instruct-fp8-fast";
 
 // Default system prompt
 const SYSTEM_PROMPT =
@@ -58,9 +58,10 @@ async function handleChatRequest(
 ): Promise<Response> {
   try {
     // Parse JSON request body
-    const { messages = [] } = (await request.json()) as {
-      messages: ChatMessage[];
-    };
+    const { messages = [], model } = (await request.json()) as ChatRequest;
+
+    // Use provided model or default
+    const modelId = model || DEFAULT_MODEL_ID;
 
     // Add system prompt if not present
     if (!messages.some((msg) => msg.role === "system")) {
@@ -68,7 +69,7 @@ async function handleChatRequest(
     }
 
     const response = await env.AI.run(
-      MODEL_ID,
+      modelId as keyof AiModels,
       {
         messages,
         max_tokens: 1024,

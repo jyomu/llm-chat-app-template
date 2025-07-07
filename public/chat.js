@@ -9,6 +9,7 @@ const chatMessages = document.getElementById("chat-messages");
 const userInput = document.getElementById("user-input");
 const sendButton = document.getElementById("send-button");
 const typingIndicator = document.getElementById("typing-indicator");
+const modelSelect = document.getElementById("model-select");
 
 // Chat state
 let chatHistory = [
@@ -36,6 +37,21 @@ userInput.addEventListener("keydown", function (e) {
 
 // Send button click handler
 sendButton.addEventListener("click", sendMessage);
+
+// Model selection change handler
+modelSelect.addEventListener("change", function () {
+  // Clear chat history when model changes and start fresh
+  chatHistory = [
+    {
+      role: "assistant",
+      content: `Hello! I'm now using ${modelSelect.options[modelSelect.selectedIndex].text} from Cloudflare Workers AI. How can I help you today?`,
+    },
+  ];
+  
+  // Clear chat messages display
+  chatMessages.innerHTML = "";
+  addMessageToChat("assistant", chatHistory[0].content);
+});
 
 /**
  * Sends a message to the chat API and processes the response
@@ -82,6 +98,7 @@ async function sendMessage() {
       },
       body: JSON.stringify({
         messages: chatHistory,
+        model: modelSelect.value,
       }),
     });
 
